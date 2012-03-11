@@ -16,4 +16,17 @@ def oneletteroff(a,b):
 def oneaway(word, all):
 	return [x for x in all if oneletteroff(word, x)]
 
-print oneaway(startword, words)
+def red(x,y):
+	if x > y:
+		return x
+	return y
+
+def search(word, target, all, depth):
+	if depth > 10:
+		return None
+	children = oneaway(word, all)
+	if target in children:
+		return depth
+	else:
+		return False
+
