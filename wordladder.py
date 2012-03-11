@@ -1,8 +1,8 @@
-startword = 'MOON'
-endword = 'GOLF'
+def allwordsoflength(l):
+	filename = '/usr/share/dict/words'
+	words = [x.upper().strip() for x in open(filename) if len(x.upper().strip()) == l] 
+	return words
 
-filename = '/usr/share/dict/words'
-words = [x.upper().strip() for x in open(filename) if len(x.upper().strip()) == len(startword)]
 
 def oneletteroff(a,b):
 	one = 0
@@ -25,33 +25,52 @@ def red(x,y):
 		return y
 	return x
 
-def search(word, target, all, done, depth):
-	if word == target:
-		return [depth, target]
-	if depth >= 10:
-		return None
-	children = oneaway(word, all)
-	if set(children) < set(done):
-		return None
-	searchable = list(set(children) - set(done))
-	words = []
-	for nword in searchable:
-		words.append(search(nword, target, all, list(set(searchable) | set(done)), depth + 1))
-	if len(words) > 0:
-		return reduce(red, words)
-	return None
+# let's make something like this
+# we have two lists
+# first is the list containing all words we have created so far
+# [ 'WOOD' ] to start
 
-def newsearch(word, target, all, maxdepth):
-	depth = 0
-	done = []
-	next = oneaway(word, all)
-	while depth < maxdepth:
-		if target in done:
-			return depth
-		done = next
-		for x in next:
-			done = list(set(done) | set(oneaway(x,all)))
-		depth += 1
-	return 'Not Found'
+# the second is a list of tuples
+# of the following format
+# (word, depth, parents)
 
-print newsearch('MOOD','WOOL',words,3)
+# so....
+
+# we iterate by taking every word from every tuple in our second list
+# and constructing the list of words that is one letter appart from said word
+# then we remove from it every word that is in our 'done' list
+# then we check if our target word is part of this set of words
+# if it's not, we take our list of new words and append it to our second list
+# using the depth +1 of our current word
+# and the parents it lists. YAY BREADTH FIRST
+
+def search(start, end, maxdepth = 20):
+	ftree = [(start, 0, [])]
+	done = [start]
+	all = allwordsoflength(len(start))
+
+	for e in ftree:
+		if e[1] > maxdepth:
+			return 'Reached Max Depth.' 
+
+		children = oneaway(e[0], all)
+		children = list(set(children) - set(done))
+		if children == [] and e == ftree[-1]:
+			return 'Search Exhausted.' 
+
+		if end in children:
+			return (e[1] + 1, ' '.join(e[2] + [e[0], end]))
+
+		for n in children:
+			ftree.append((n, e[1] + 1, e[2] + [e[0]]))
+		
+		done = list(set(done) | set(children))
+
+print search('PIG','STY')
+print search('OAT','RYE')
+print search('CHIN','NOSE')
+print search('PITY','GOOD')
+print search('PITCH','TENTS')
+print search('FLOUR','BREAD')
+print search('COLD','WARM')
+	
