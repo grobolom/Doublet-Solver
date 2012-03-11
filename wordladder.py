@@ -41,4 +41,17 @@ def search(word, target, all, done, depth):
 		return reduce(red, words)
 	return None
 
-print search('MOON', 'WOLF', words, [], 0)
+def newsearch(word, target, all, maxdepth):
+	depth = 0
+	done = []
+	next = oneaway(word, all)
+	while depth < maxdepth:
+		if target in done:
+			return depth
+		done = next
+		for x in next:
+			done = list(set(done) | set(oneaway(x,all)))
+		depth += 1
+	return 'Not Found'
+
+print newsearch('MOOD','WOOL',words,3)
