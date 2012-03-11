@@ -17,16 +17,23 @@ def oneaway(word, all):
 	return [x for x in all if oneletteroff(word, x)]
 
 def red(x,y):
-	if x > y:
-		return x
-	return y
+	if x == None:
+		return y
+	if isinstance(x,list) and isinstance(y,list):
+		if x[0] < y[0]:
+			return x
+		return y
+	return x
 
 def search(word, target, all, depth):
-	if depth > 10:
+	if word == target:
+		return [depth, target]
+	if depth >= 4:
 		return None
 	children = oneaway(word, all)
-	if target in children:
-		return depth
-	else:
-		return False
+	words = []
+	for nword in children:
+		words.append(search(nword, target, all, depth + 1))
+	return reduce(red, words)
 
+print search('MOON', 'WOLF', words, 0)
