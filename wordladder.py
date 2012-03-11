@@ -25,15 +25,20 @@ def red(x,y):
 		return y
 	return x
 
-def search(word, target, all, depth):
+def search(word, target, all, done, depth):
 	if word == target:
 		return [depth, target]
-	if depth >= 4:
+	if depth >= 10:
 		return None
 	children = oneaway(word, all)
+	if set(children) < set(done):
+		return None
+	searchable = list(set(children) - set(done))
 	words = []
-	for nword in children:
-		words.append(search(nword, target, all, depth + 1))
-	return reduce(red, words)
+	for nword in searchable:
+		words.append(search(nword, target, all, list(set(searchable) | set(done)), depth + 1))
+	if len(words) > 0:
+		return reduce(red, words)
+	return None
 
-print search('MOON', 'WOLF', words, 0)
+print search('MOON', 'WOLF', words, [], 0)
